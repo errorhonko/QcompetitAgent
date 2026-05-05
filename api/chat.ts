@@ -1,24 +1,26 @@
 import OpenAI from 'openai'
 
-export const config = {
-  runtime: 'edge', // 使用 Edge Runtime 速度更快
-}
-
-export default async function handler(req: Request) {
+// 使用标准 Node.js Serverless Function 模式 (最稳定的本地兼容性)
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 })
+    return res.status(405).send('Method Not Allowed')
   }
 
+  console.log('[API] 收到请求...')
+
   try {
-    const { messages, tools, tool_choice } = await req.json()
+    const { messages, tools, tool_choice } = req.body
     
-    // 从环境变量读取 Key，Vercel 会自动注入
-    const apiKey = process.env.DEEPSEEK_API_KEY
+    // 兼容所有可能的命名方式
+    const apiKey = process.env.DEEPSEEK_API_KEY || 
+                   process.env.VITE_DEEPSEEK_API_KEY || 
+                   process.env.VITE_GEMINI_API_KEY
+    
+    console.log(`[API] API Key 状态: ${apiKey ? '已找到' : '未找到'}`)
     
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'Missing API Key in server environment' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
+      return res.status(500).json({ 
+        error: 'Missing API Key. Please check your .env file or Vercel settings.' 
       })
     }
 
@@ -26,6 +28,8 @@ export default async function handler(req: Request) {
       apiKey: apiKey,
       baseURL: 'https://api.deepseek.com'
     })
+
+    console.log('[API] 正在调用 DeepSeek...')
 
     const response = await openai.chat.completions.create({
       model: 'deepseek-chat',
@@ -35,16 +39,11 @@ export default async function handler(req: Request) {
       temperature: 0.7
     })
 
-    return new Response(JSON.stringify(response), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    console.log('[API] DeepSeek 回复成功')
+    return res.status(200).json(response)
 
   } catch (error: any) {
     console.error('API Proxy Error:', error)
-    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return res.status(500).json({ error: error.message || 'Internal Server Error' })
   }
 }

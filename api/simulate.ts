@@ -1,20 +1,18 @@
 import OpenAI from 'openai'
 
-export const config = {
-  runtime: 'edge',
-}
-
-export default async function handler(req: Request) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 })
+    return res.status(405).send('Method Not Allowed')
   }
 
   try {
-    const { scenario, members } = await req.json()
-    const apiKey = process.env.DEEPSEEK_API_KEY
+    const { scenario, members } = req.body
+    const apiKey = process.env.DEEPSEEK_API_KEY || 
+                   process.env.VITE_DEEPSEEK_API_KEY || 
+                   process.env.VITE_GEMINI_API_KEY
     
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'Missing API Key' }), { status: 500 })
+      return res.status(500).json({ error: 'Missing API Key' })
     }
 
     const openai = new OpenAI({
@@ -39,12 +37,10 @@ ${members.map((m: any, i: number) => `${i+1}. ${m.name}`).join('\n')}
       response_format: { type: 'json_object' }
     })
 
-    return new Response(response.choices[0].message.content, {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    const result = JSON.parse(response.choices[0].message.content || '{}')
+    return res.status(200).json(result)
 
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 })
+    return res.status(500).json({ error: error.message })
   }
 }
