@@ -1,5 +1,3 @@
-import OpenAI from 'openai'
-
 export interface GroupMessage {
   name: string
   text: string

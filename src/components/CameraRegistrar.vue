@@ -9,7 +9,8 @@ const props = defineProps<{
 console.log('🔧 [CameraRegistrar] 组件已创建')
 
 // 从 TresContext 获取相机
-const { camera: contextCamera } = useTresContext()
+const context = useTresContext() as any
+const contextCamera = context.camera
 
 console.log('🔧 [CameraRegistrar] contextCamera ref 已获取')
 

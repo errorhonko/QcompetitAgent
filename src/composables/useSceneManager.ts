@@ -1,4 +1,4 @@
-import { ref, shallowRef, computed, watch, reactive } from 'vue'
+import { ref, shallowRef, computed, reactive } from 'vue'
 import * as THREE from 'three'
 
 export interface WindowRect {

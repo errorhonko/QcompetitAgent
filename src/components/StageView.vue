@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { watch } from 'vue'
-import { useLoop, useTresContext } from '@tresjs/core'
+import { useLoop } from '@tresjs/core'
 import { OrbitControls } from '@tresjs/cientos'
 import MyAvatar from './MyAvatar.vue'
 import MusicNotes from './MusicNotes.vue'
@@ -14,8 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['reset'])
 
-const { camera } = useTresContext()
-const { cameraRef, controlsRef, update3D, currentCamera } = useSceneManager()
+const { update3D, currentCamera } = useSceneManager()
 
 // 移除原有的 watch(camera, ...)，改为直接在 App.vue 通过 ref 绑定
 // 这样可以确保 cameraRef 总是指向最顶层的相机实例

@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import OpenAI from 'openai'
 
 export interface AgentResponse {
   reply: string
@@ -39,13 +38,6 @@ export const useAgent = () => {
     }
 
     isThinking.value = true
-
-    // 初始化 OpenAI 客户端，指向 DeepSeek 节点
-    const openai = new OpenAI({
-      apiKey: apiKey,
-      baseURL: 'https://api.deepseek.com',
-      dangerouslyAllowBrowser: true 
-    })
 
     try {
       const momentsInfo = externalContext.recentMoments?.map(m => `- [${m.time}] ${m.content}${m.moodTag ? ` (情感标签: ${m.moodTag})` : ''}`).join('\n') || '暂无最近动态'

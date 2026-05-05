@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { shallowRef, onMounted, onUnmounted } from 'vue'
 import * as THREE from 'three'
+// @ts-ignore
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { VRMLoaderPlugin } from '@pixiv/three-vrm'
 import { useLoop } from '@tresjs/core'
@@ -30,10 +31,10 @@ const handleMouseMove = (event: MouseEvent) => {
 
 const loadModel = () => {
   const loader = new GLTFLoader()
-  loader.register((parser) => new VRMLoaderPlugin(parser))
-  loader.register((parser) => new VRMAnimationLoaderPlugin(parser))
+  loader.register((parser: any) => new VRMLoaderPlugin(parser))
+  loader.register((parser: any) => new VRMAnimationLoaderPlugin(parser))
   
-  loader.load('/avatar_fixed.vrm', (gltf) => {
+  loader.load('/avatar_fixed.vrm', (gltf: any) => {
     const vrm = gltf.userData.vrm
     if (vrm) {
       vrmInstance.value = vrm
@@ -42,7 +43,7 @@ const loadModel = () => {
       
       // 加载动画的辅助函数
       const loadAnim = (url: string, name: string, isDefault = false) => {
-        loader.load(url, (vrmAnimGltf) => {
+        loader.load(url, (vrmAnimGltf: any) => {
           const vrmAnimations = vrmAnimGltf.userData.vrmAnimations
           if (vrmAnimations?.length > 0) {
             const clip = createVRMAnimationClip(vrmAnimations[0], vrm)
@@ -122,7 +123,7 @@ onUnmounted(() => {
 })
 
 const { onBeforeRender } = useLoop()
-onBeforeRender(({ delta, elapsed }) => {
+onBeforeRender(({ delta }) => {
   if (vrmInstance.value) {
     const vrm = vrmInstance.value
     mixer.value?.update(delta)

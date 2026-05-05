@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useLoop } from '@tresjs/core'
 import * as THREE from 'three'
 

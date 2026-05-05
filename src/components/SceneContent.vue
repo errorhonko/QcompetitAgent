@@ -2,6 +2,7 @@
 import { shallowRef, onMounted, watch, ref } from 'vue'
 import { useLoop, useTresContext } from '@tresjs/core'
 import * as THREE from 'three'
+// @ts-ignore
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { VRMLoaderPlugin } from '@pixiv/three-vrm'
 import { VRMAnimationLoaderPlugin, createVRMAnimationClip } from '@pixiv/three-vrm-animation'
@@ -11,9 +12,10 @@ const props = defineProps<{
   cameraStore: any
 }>()
 
-const { camera } = useTresContext()
-const vrmInstance = shallowRef(null)
-const modelScene = shallowRef(null)
+const context = useTresContext() as any
+const camera = context.camera
+const vrmInstance = shallowRef<any>(null)
+const modelScene = shallowRef<any>(null)
 const mixer = shallowRef<THREE.AnimationMixer | null>(null)
 const currentExpression = shallowRef('neutral')
 
@@ -36,15 +38,15 @@ const cameraConfig = {
 // 加载模型
 const loadModel = () => {
   const loader = new GLTFLoader()
-  loader.register((p) => new VRMLoaderPlugin(p))
-  loader.register((p) => new VRMAnimationLoaderPlugin(p))
-  loader.load('/avatar_fixed.vrm', (gltf) => {
+  loader.register((p: any) => new VRMLoaderPlugin(p))
+  loader.register((p: any) => new VRMAnimationLoaderPlugin(p))
+  loader.load('/avatar_fixed.vrm', (gltf: any) => {
     const vrm = gltf.userData.vrm
     if (vrm) {
       vrmInstance.value = vrm
       modelScene.value = gltf.scene
       mixer.value = new THREE.AnimationMixer(gltf.scene)
-      loader.load('/idle_loop.vrma', (vrmAnimGltf) => {
+      loader.load('/idle_loop.vrma', (vrmAnimGltf: any) => {
         const vrmAnimations = vrmAnimGltf.userData.vrmAnimations
         if (vrmAnimations?.length > 0) {
           const clip = createVRMAnimationClip(vrmAnimations[0], vrm)
