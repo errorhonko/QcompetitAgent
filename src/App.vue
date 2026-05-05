@@ -34,7 +34,7 @@ interface ChatMessage {
 const userInput = ref('')
 const messages = ref<ChatMessage[]>([
   { id: 1, type: 'system', text: '2026年5月4日' },
-  { id: 2, role: 'assistant', text: '你好！我是小Q，你的伴随式智能生命体。视角和光照都已经为你准备好啦，想聊点什么吗？' }
+  { id: 2, role: 'assistant', text: '你好呀！我是小Q。已经为你准备好啦，今天想聊点什么有趣的话题吗？' }
 ])
 // 当前选中的标签页
 const activeTab = ref('chat') // 'chat' | 'moments' | 'status' | 'group' | 'lab'
@@ -412,9 +412,23 @@ const clampResize = () => {
   currentWindow.h = Math.max(150, Math.min(currentWindow.h, maxH))
 }
 
-// 启动时初始化一下兜底
-onMounted(() => {
+// 启动时执行开场欢迎序列
+onMounted(async () => {
+  // 1. 初始视角
   applyPreset('chat', false)
+  
+  // 等待模型加载及初始动画就绪
+  await new Promise(resolve => setTimeout(resolve, 1500))
+  
+  // 2. 突然拉近镜头并打招呼
+  applyPreset('focus_default', true)
+  currentExpression.value = 'happy'
+  currentAction.value = 'anim_2' // 活泼地跳起招手
+  
+  // 3. 停留几秒展示特写后，优雅地退回远景
+  setTimeout(() => {
+    applyPreset('chat', true)
+  }, 4500)
 })
 
 </script>
