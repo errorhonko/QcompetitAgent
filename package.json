@@ -9,12 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@google/genai": "catalog:",
+    "@google/genai": "^1.51.0",
     "@pixiv/three-vrm": "^3.5.2",
-    "@pixiv/three-vrm-animation": "catalog:",
+    "@pixiv/three-vrm-animation": "^3.5.2",
     "@tresjs/cientos": "^5.7.0",
     "@tresjs/core": "^5.8.0",
-    "openai": "catalog:",
+    "openai": "^6.35.0",
     "three": "^0.184.0",
     "vue": "^3.5.32"
   },
