@@ -12,16 +12,27 @@ const {
   applyPreset, 
   saveCurrentPreset,
   currentWindow,
-  currentCamera,
-  cameraRef
+  currentCamera
 } = useSceneManager()
 
 const currentExpression = ref('neutral')
 const currentAction = ref('idle')
 
+// 定义聊天消息接口
+interface ChatMessage {
+  id: number
+  role?: 'user' | 'assistant' | 'system' | 'group-member'
+  type?: 'system' | 'moment' | 'ambient'
+  text: string
+  moodTag?: string
+  name?: string
+  color?: string
+  time?: string
+}
+
 // 聊天状态
 const userInput = ref('')
-const messages = ref([
+const messages = ref<ChatMessage[]>([
   { id: 1, type: 'system', text: '2026年5月4日' },
   { id: 2, role: 'assistant', text: '你好！我是小Q，你的伴随式智能生命体。视角和光照都已经为你准备好啦，想聊点什么吗？' }
 ])
@@ -117,9 +128,11 @@ const runAISimulation = async (scenario: string) => {
   isSimulating.value = false
 }
 
+const { chat, isThinking } = useAgent()
+
 const handleGroupSummary = async () => {
   if (groupMessages.value.length <= 1) {
-    alert("群里还没人说话呢，先开启自动刷屏吧！")
+    alert("群里还没人说话呢，请先开启 AI 模拟！")
     return
   }
 
@@ -158,10 +171,10 @@ const handleGroupSummary = async () => {
 }
 
 // 模拟状态数据
-const currentStatus = ref('idle') // 'idle' | 'music' | 'gaming'
+const currentStatus = ref<'idle' | 'music' | 'gaming'>('idle')
 const gameEvents = ref<string[]>([])
 
-const setStatus = (status: string) => {
+const setStatus = (status: 'idle' | 'music' | 'gaming') => {
   currentStatus.value = status
   if (status === 'gaming') {
     gameEvents.value = ['正在进入王者荣耀...']
@@ -176,14 +189,11 @@ const simulatePentaKill = async () => {
   isThinking.value = true
   const history = messages.value.slice(-5).map(m => `${m.role}: ${m.text}`).join('\n')
   
-  // 模拟一个极其兴奋的战况上报
-  const externalContext = {
+  const response = await chat("我刚刚拿了五杀！", history, {
     recentMoments: [],
-    currentStatus: 'gaming',
+    currentStatus: currentStatus.value,
     gameEvent: '五杀 (PENTA KILL)'
-  }
-  
-  const response = await chat("我刚刚拿了五杀！", history, externalContext)
+  })
   
   if (response) {
     messages.value.push({ 
@@ -290,8 +300,6 @@ const onSpeechMouseLeave = () => {
   isSpeechHovered.value = false
   startSpeechTimer(3000) // 鼠标离开后 3 秒消失
 }
-
-const { chat, isThinking } = useAgent()
 
 const toggleViewMode = () => {
   const newMode = activePresetId.value === 'chat' ? `focus_${currentAction.value}` : 'chat'
